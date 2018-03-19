@@ -41,17 +41,12 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
 
                 base = 32 + (16 * i)
 
-                id = recv_buf[base] << 24 | recv_buf[base+1] << 16 | recv_buf[base+2] << 8 | recv_buf[base+3]
+                id = recv_buf[base] << 24 | recv_buf[base+1] << 16 | recv_buf[base+2] << 8 | recv_buf[base+3] + 3
                 x = recv_buf[base+4] << 24 | recv_buf[base+4+1] << 16 | recv_buf[base+4+2] << 8 | recv_buf[base+4+3]
                 y = recv_buf[base+8] << 24 | recv_buf[base+8+1] << 16 | recv_buf[base+8+2] << 8 | recv_buf[base+8+3]
                 c = recv_buf[base+12] << 24 | recv_buf[base+12+1] << 16 | recv_buf[base+12+2] << 8 | recv_buf[base+12+3]
 
                 tags[id] = GulliViewTag(id,x,y,c)
-
-            #print "Tag 1 Id: %d,  x: %d y: %d, id: %d" %  (t,x,y,id)
-            #print "Tag 2 Id: %d,  x: %d y: %d id: %d" %  (nt,nx,ny,nid)
-
-        #
 
         for client in clients:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -63,7 +58,7 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
                 'tagid1': gvTag1.id,
                 'x1': gvTag1.x,
                 'y1': gvTag1.y,
-                'cameraId1': gvTag2.cameraId,
+                'cameraId1': gvTag1.cameraId,
                 'tagid2': gvTag2.id,
                 'x2': gvTag2.x,
                 'y2': gvTag2.y,
