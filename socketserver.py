@@ -86,10 +86,10 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
             sock.sendto(data.encode(), (client.ip, 2121))
 
 def func():
-    print "Welcome to the GulliView socket server"
+    print "Add a new car:"
     ip = raw_input("Enter ROS Master Ip: ")
-    tagId1 = raw_input("Enter GulliView Tag ID 1: ")
-    tagId2 = raw_input("Enter GulliView Tag ID 2: ")
+    tagId1 = raw_input("Enter the front tag ID: ")
+    tagId2 = raw_input("Enter the back tag ID: ")
     clients.append(GVClient(ip, tagId1, tagId2))
     raw_input("Press enter to add a another car...")
     func()
@@ -102,12 +102,14 @@ if __name__ == "__main__":
         exit(0)
     hostArg = sys.argv[1]
 
+    print "Welcome to the GulliView socket server"
+
     HOST, PORT = hostArg, 2020
     server = SocketServer.UDPServer((HOST, PORT), MyUDPHandler)
     try:
         # user input from this thread
         thread.start_new_thread(func, ())
-        
+
         # capturing gv data from this thread
         thread.start_new_thread(server.serve_forever, ())
     except:
