@@ -29,6 +29,8 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
 
+        len = 0
+
         # Listening to input from the GV server
         recv_buf = np.frombuffer(self.request[0], dtype=np.uint8)
 
@@ -81,6 +83,7 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
                 'x2': gvTag2.x,
                 'y2': gvTag2.y,
                 'cameraId2': gvTag2.cameraId,
+                'number_of_tags' : len
             })
 
             sock.sendto(data.encode(), (client.ip, 2121))
