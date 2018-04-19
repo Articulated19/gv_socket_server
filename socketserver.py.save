@@ -1,4 +1,4 @@
-# encoding: utf-8
+    # encoding: utf-8
 
 import SocketServer
 import numpy as np
@@ -7,8 +7,8 @@ import json
 import socket
 import sys
 
+tags = {}
 clients = []
-
 
 class GVClient():
 
@@ -16,7 +16,6 @@ class GVClient():
         self.ip = ip
         self.tag1 = tag1
         self.tag2 = tag2
-
 
 class GulliViewTag():
 
@@ -26,12 +25,9 @@ class GulliViewTag():
         self.y = y
         self.cameraId = cameraId
 
-
 class MyUDPHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
-
-        tags = {}
 
         len = 0
 
@@ -50,25 +46,23 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
             # Tag data from the GulliView server is placed in the buffer data
             # from the 32nd bit. A new tag is placed then placed every 16th bit
             for i in range(len):
+
                 base = 32 + (16 * i)
 
                 # Fetching tag id
-                id = recv_buf[base] << 24 | recv_buf[base + 1] << 16 | recv_buf[base + 2] << 8 | recv_buf[base + 3] + 3
-                #print id
+                id = recv_buf[base] << 24 | recv_buf[base+1] << 16 | recv_buf[base+2] << 8 | recv_buf[base+3] + 3
+
                 # X position of tag
-                x = recv_buf[base + 4] << 24 | recv_buf[base + 4 + 1] << 16 | recv_buf[base + 4 + 2] << 8 | recv_buf[
-                    base + 4 + 3]
+                x = recv_buf[base+4] << 24 | recv_buf[base+4+1] << 16 | recv_buf[base+4+2] << 8 | recv_buf[base+4+3]
 
                 # Y position of tag
-                y = recv_buf[base + 8] << 24 | recv_buf[base + 8 + 1] << 16 | recv_buf[base + 8 + 2] << 8 | recv_buf[
-                    base + 8 + 3]
+                y = recv_buf[base+8] << 24 | recv_buf[base+8+1] << 16 | recv_buf[base+8+2] << 8 | recv_buf[base+8+3]
 
                 # Camera capturing the tag
-                c = recv_buf[base + 12] << 24 | recv_buf[base + 12 + 1] << 16 | recv_buf[base + 12 + 2] << 8 | recv_buf[
-                    base + 12 + 3]
+                c = recv_buf[base+12] << 24 | recv_buf[base+12+1] << 16 | recv_buf[base+12+2] << 8 | recv_buf[base+12+3]
 
                 # The current tags in view are added to a list
-                tags[id] = GulliViewTag(id, x, y, c)
+                tags[id] = GulliViewTag(id,x,y,c)
 
         # For every connected client to our server
         # we establish a connection to them and feed them data from GV
@@ -77,36 +71,23 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
             # We only send data about the tags the client is asking for
-
-            t1 = int(client.tag1)
-            t2 = int(client.tag2)
-
-            if t1 in tags and t2 not in tags:
-                gvTag1 = tags[t1]
-                gvTag2 = GulliViewTag(0, 0, 0, 0)
-            elif t1 not in tags and t2 in tags:
-                gvTag1 = tags[t2]
-                gvTag2 = GulliViewTag(0, 0, 0, 0)
-
-            elif t1 in tags and t2 in tags:
-                gvTag1 = tags[t1]
-                gvTag2 = tags[t2]
-
-            else:
-                return
             
+gvTag1 = tags[int(client.tag1)]
+            gvTag2 = tags[int(client.tag2)]
+
             data = json.dumps({
                 'tagid1': gvTag1.id,
                 'x1': gvTag1.x,
                 'y1': gvTag1.y,
-                'cameraid': gvTag1.cameraId,
+                'cameraId1': gvTag1.cameraId,
                 'tagid2': gvTag2.id,
                 'x2': gvTag2.x,
-                'y2': gvTag2.y
+                'y2': gvTag2.y,
+                'cameraId2': gvTag2.cameraId,
+                'number_of_tags' : len
             })
 
             sock.sendto(data.encode(), (client.ip, 2121))
-
 
 def func():
     print "Add a new car:"
@@ -116,7 +97,6 @@ def func():
     clients.append(GVClient(ip, tagId1, tagId2))
     raw_input("Press enter to add a another car...")
     func()
-
 
 if __name__ == "__main__":
 
