@@ -93,7 +93,7 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
                 gvTag2 = tags[t2]
 
             else:
-                return
+                continue
             
             data = json.dumps({
                 'tagid1': gvTag1.id,
@@ -111,9 +111,9 @@ class MyUDPHandler(SocketServer.BaseRequestHandler):
 def func():
     print "Add a new car:"
     ip = raw_input("Enter ROS Master Ip: ")
-    tagId1 = raw_input("Enter the front tag ID: ")
-    tagId2 = raw_input("Enter the back tag ID: ")
-    clients.append(GVClient(ip, tagId2, tagId1))
+    tagId1 = raw_input("Enter the back tag ID: ")
+    tagId2 = raw_input("Enter the front tag ID: ")
+    clients.append(GVClient(ip, tagId1, tagId2))
     raw_input("Press enter to add a another car...")
     func()
 
